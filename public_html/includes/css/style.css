@@ -93,9 +93,8 @@ img.rounded-default{
 }
 #content{
     /*background-color: #198dc9;*/
-    margin-top:50px;
-    position: static;
     min-height:1000px;
+    margin-top: 0px !important;
 }
 .navbar-static-top .anchor, .navbar-static-top .anchor:hover,.navbar-static-top .anchor:link{
     background-color: transparent;

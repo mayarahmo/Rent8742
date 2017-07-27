@@ -1,3 +1,4 @@
+<?php include_once ('rootdirectory.php'); ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -13,7 +14,10 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
     <!-- FOLHA DE ESTILOS PRINCIPAL -->
-    <link rel="stylesheet" href="includes/css/main.css">
+    <link rel="stylesheet" href="includes/css/style.css">
+
+    <!-- LOGGED-BAR STYLESHEET -->
+    <link rel="stylesheet" href="includes/css/logged-bar.scss">
 
     <!--[if lt IE 9]>
     <![endif]-->
@@ -23,6 +27,10 @@
 </head>
 
 <body>
+<?php
+    include_once ('logged-bar.php');
+
+?>
 <header class="navbar navbar-static-top" id="top">
     <div class="col-md-6 col-xs-12" class="logo">
         <a name="topo" class="anchor" href="#"><img src="includes/media/logo.png" id="logo" class="col-md-offset-2"></a>
@@ -61,17 +69,12 @@
     </div>
 </header>
 
-<!--<div id="2323" style="background-color: yellow">-->
-<!--dsfsdfsdf-->
-<!--</div>-->
-<?php echo "oi;" ?>
-
 <div id="adsense-search" class="col-md-12">
     <div class="col-xs-12 col-md-7 col-md-offset-1" id="adsense-1">
         <!-- INSIRA CÓDIGO DE ANÚNCIO AQUI -->
         ANÚNCIO
     </div>
-    <div class="col-xs-12 col-md-3" id="search">
+    <div class="col-xs-12 col-md-3 div-border-effect" id="search">
         <div class="col-xs-12">
             <form id="search-form" class=""><input type="text" class="form-control" id="search-input" placeholder="..Buscar"/><button type="submit" form_id="search-form">&nbsp;</button>
             </form>

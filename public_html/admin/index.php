@@ -1,3 +1,4 @@
+<?php include_once ('../rootdirectory.php'); ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -13,13 +14,7 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
     <!-- FOLHA DE ESTILOS PRINCIPAL -->
-    <link rel="stylesheet" href="includes/css"/>
-
-    <style type="text/css">
-    body{
-        background-color: #198dc9;
-    }
-    </style>
+    <link rel="stylesheet" href="includes/css/main.scss"/>
 
     <!--[if lt IE 9]>
     <![endif]-->
@@ -31,27 +26,39 @@
 <body>
 <?php
 
-
-
 include_once("connection.php");
 
+echo "<header class=\"navbar-static-top col-md-12 col-xs-12\">";
 if (isset($_POST)) {
     if ($_POST){
         $connection = new createConnection();
         $connection->connectToDatabase();
         $result = $connection->runQuery("Select * from users where email = '".$_POST["email"]."'");
         if (mysqli_num_rows($result) == 0) {
-            echo "Usuário inexistente";
+            echo "<p class='user-msg'>! Usuário inexistente !</p>";
         }else{
-            
+            $result = $connection->runQuery("Select * from users where email ='".$_POST["email"]."' and passwd = '".MD5($_POST["passwd"])."'");
+            if (mysqli_num_rows($result) == 0) {
+                echo "<p class='user-msg'>! Senha incorreta !</p>";
+            }else{
+                session_start();
+                $user_data = mysqli_fetch_array($result);
+                $_SESSION['user'] = $user_data['id'];
+                $_SESSION['nick'] = $user_data['nick'];
+                $_SESSION['level'] = $user_data['level'];
+                $_SESSION['email'] = $user_data['email'];
+//                session_destroy();
+                header('Location: '.SITE_ROOT);
+            }
         }
     }
 }
+echo "</header>";
 ?>
 <div class="form">
 
     <ul class="tab-group">
-        <li class="tab"><a href="#login">Log In</a></li>
+        <li class="tab" id="login-link"><a href="#login">Quero logar</a></li>
     </ul>
 
     <div class="tab-content">
@@ -59,7 +66,7 @@ if (isset($_POST)) {
         <div id="login">
             <h1>Rentabilidade Passiva</h1>
 
-            <form action="index.php" method="post">
+            <form action="index.php" method="post" id="login-form">
 
                 <div class="field-wrap">
                     <label>
