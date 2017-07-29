@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="includes/css/style.css">
 
     <!-- LOGGED-BAR STYLESHEET -->
-    <link rel="stylesheet" href="includes/css/logged-bar.scss">
+    <link rel="stylesheet" href="includes/css/logged-bar.css">
 
     <!--[if lt IE 9]>
     <![endif]-->
@@ -28,7 +28,7 @@
 
 <body>
 <?php
-    include_once ('logged-bar.php');
+    include_once('logged-bar.php');
 
 ?>
 <header class="navbar navbar-static-top" id="top">

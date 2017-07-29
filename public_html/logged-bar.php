@@ -12,7 +12,7 @@ if (!empty($_SESSION)){
     echo "<p class='logged-msg col-md-6'> Bem-vindo(a) " . $_SESSION['nick'] . " </p>";
     echo "<ul class='col-md-6'>";
     if ($_SESSION['level'] == "1") {
-        echo  "<li><a href=".SITE_ROOT."/create.php>Criar postagem</a></li>";
+        echo  "<li><a href=".SITE_ROOT."/admin/create.php>Criar postagem</a></li>";
     }else{
     }
     echo "<li><a href=".SITE_ROOT."/loggout.php>Sair</a></li>";

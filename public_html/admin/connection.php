@@ -23,7 +23,11 @@ class createConnection //create a class for make connection
     function connectToDatabase() // create a function for connect database
     {
 
-        $conn= mysqli_connect($this->host,$this->username,$this->password, $this->database);
+//        $conn= mysqli_connect($this->host,$this->username,$this->password, $this->database);
+        $conn = new PDO("mysql:host=$this->host;dbname=$this->database;",$this->username,$this->password);
+
+        // set the PDO error mode to exception
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         if(!$conn)// testing the connection
         {

@@ -1,10 +1,10 @@
 $white: #fff;
-$dark-gray: grey;
+$dark-gray: #444;
 $black: #000;
 *{
 }
 #logged-bar{
-    background-color: #0d78af;
+    background-color: $dark-gray;
     padding-top: 7px;
     color: #fff;
     z-index: 8000;

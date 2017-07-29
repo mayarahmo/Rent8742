@@ -1,4 +1,4 @@
-<?php include_once ('../rootdirectory.php'); ?>
+<?php include_once('../rootdirectory.php'); ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -32,24 +32,31 @@ echo "<header class=\"navbar-static-top col-md-12 col-xs-12\">";
 if (isset($_POST)) {
     if ($_POST){
         $connection = new createConnection();
-        $connection->connectToDatabase();
-        $result = $connection->runQuery("Select * from users where email = '".$_POST["email"]."'");
-        if (mysqli_num_rows($result) == 0) {
+        $conn = $connection->connectToDatabase();
+        $stmt = $conn->prepare("Select * from users where email = :email");
+        $stmt->bindParam(':email', $_POST['email'], PDO::PARAM_STR);
+        $stmt->execute();
+        if ($stmt->fetchColumn()== 0) {
             echo "<p class='user-msg'>! Usuário inexistente !</p>";
         }else{
-            $result = $connection->runQuery("Select * from users where email ='".$_POST["email"]."' and passwd = '".MD5($_POST["passwd"])."'");
-            if (mysqli_num_rows($result) == 0) {
+            $stmt = $conn->prepare("Select * from users where email = :email and passwd = MD5(:passwd)");
+            $stmt->bindParam(':passwd', $_POST['passwd'], PDO::PARAM_STR);
+            $stmt->bindParam(':email', $_POST['email'], PDO::PARAM_STR);
+            $stmt->execute();
+            $num_rows = 1;
+            $user_data = $stmt->fetchAll();
+            if ($stmt->rowCount() == 0) {
                 echo "<p class='user-msg'>! Senha incorreta !</p>";
             }else{
                 session_start();
-                $user_data = mysqli_fetch_array($result);
-                $_SESSION['user'] = $user_data['id'];
-                $_SESSION['nick'] = $user_data['nick'];
-                $_SESSION['level'] = $user_data['level'];
-                $_SESSION['email'] = $user_data['email'];
-//                session_destroy();
+                $_SESSION['user'] = $user_data[0]['id'];
+                $_SESSION['nick'] = $user_data[0]['nick'];
+                $_SESSION['level'] = $user_data[0]['level'];
+                $_SESSION['email'] = $user_data[0]['email'];
+                print_r($_SESSION);
                 header('Location: '.SITE_ROOT);
             }
+            $conn = null;
         }
     }
 }
