@@ -2,7 +2,9 @@
 
 include_once('../rootdirectory.php');
 include_once('../logged-bar.php');
+include_once('connection.php');
 
+// tratamento de sessão
 if (isset($_SESSION)){
     if ($_SESSION['level'] != 1){
         header("Location: ".SITE_ROOT);
@@ -10,9 +12,8 @@ if (isset($_SESSION)){
 }else{
     header('Location: '.SITE_ROOT);
 }
-?>
 
-<?php include_once('connection.php'); ?>
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -43,19 +44,69 @@ if (isset($_SESSION)){
 <body>
 <?php
 
-if (!empty($_GET)){
-    if ($_GET){
+if (!empty($_POST)){
+    if ($_POST){
+
+        try {
+            if (!($_FILES['userfile']['size'] == 0)) {
+
+                $uploaddir = '../uploads/posts_images/';
+                $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
+                $imageFileType = pathinfo($uploadfile, PATHINFO_EXTENSION);
+
+                echo '<pre>';
+
+                if (file_exists($uploadfile)) {   // Check if file already exists
+                    echo "Desculpe, arquivo já existe.";
+                } else if ($_FILES["userfile"]["size"] > 2621440) {
+                    echo "Sorry, your file is too large.";
+                } else if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" // check file types
+                    && $imageFileType != "gif"
+                ) {
+                    echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+                } else {
+                    if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
+                        echo "Arquivo válido e enviado com sucesso.\n";
+                    } else {
+                        echo "Possível ataque de upload de arquivo!\n";
+                    }
+
+                    // echo 'Aqui está mais informações de debug:';
+                    //print_r($_FILES);
+                }
+                print "</pre>";
+            }
+
+        } catch (RuntimeException $e) {
+
+            echo $e->getMessage();
+
+        }
+
         try {
             $connection = new createConnection();
             $conn = $connection->connectToDatabase();
-            $stmt = $conn->prepare("INSERT INTO posts (id, title, content, img_url, timestamp) VALUES (DEFAULT,:title, :content, '' ,DEFAULT)");
-            $stmt->bindParam(':title', $_GET['title']);
-            $stmt->bindParam(':content', $_GET['content']); $stmt->debugDumpParams();
-
+            $stmt = $conn->prepare("INSERT INTO posts (id, title, content, img_url, timestamp) VALUES (DEFAULT,:title, :content, :img_url ,DEFAULT)");
+            $stmt->bindParam(':title', $_POST['title']);
+            $stmt->bindParam(':content', $_POST['content']); //$stmt->debugDumpParams();
+            $stmt->bindParam(':img_url', $_FILES['userfile']['name']);
             $return = $stmt->execute();
+            $stmt1 = $conn->prepare("Select MAX(id) from posts");
+            $stmt1->execute();
+            $post_id = $stmt1->fetchColumn(0);
+            if (isset($_POST['categories'])) {
+                foreach ($_POST['categories'] as $cat) {
+                    $stmt = $conn->prepare("INSERT INTO post_category (post_id, category_id, timestamp) VALUES (:post_id, $cat, DEFAULT)");
+                    $stmt->bindParam(':post_id',$post_id);
+                    $stmt->execute();
+                }
+
+            }
+            echo "<pre>";
             if ($return) {
                 echo "Adicionado com sucesso";
             }
+            echo "</pre>";
             $conn = null;
         }catch (PDOException $e){
             echo "Error: ".$e->getMessage();
@@ -69,8 +120,8 @@ if (!empty($_GET)){
 <div id="content">
     <div class="col-xs-12 col-md-7 col-md-offset-1 content div-border-effect">
         <h1 class="post-title">Adicionar um post</h1>
-        <form method="get" action="/admin/create.php">
-
+        <form method="post" enctype="multipart/form-data" action="/admin/create.php">
+            <input type="hidden" name="MAX_FILE_SIZE" value="2621440" />
             <p><label for="title"> Title: &nbsp;<input type="text" name="title" required></label></p>
 
             <p><label for="content"> Corpo:</label><BR />
@@ -86,14 +137,14 @@ if (!empty($_GET)){
                         $stmt = $conn->prepare("Select * from categories");
                         $stmt->execute();
                         foreach ($stmt->fetchAll() as $cat){
-                            echo "<label>".UTF8_Encode($cat['name'])."</label><input type='checkbox' name='categories' value=".$cat['id'].">";
+                            echo "<label>".UTF8_Encode($cat['name'])."</label><input type='checkbox' name='categories[]' value=".$cat['id'].">";
                         }
 
                     ?>
 
             </p>
 
-            <p><label for="img">Imagem: <input type="file" name="imgtoupload" id="imgtoupload"></label></p>
+            <p><label for="img">Imagem: <input type="file" name="userfile" id="userfile"></label></p>
             <button type="submit">Adicionar</button>
         </form>
     </div>
